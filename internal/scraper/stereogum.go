@@ -14,6 +14,9 @@ import (
 func makeStereogumRelease(name string, artistNames []string, link string, publishDate string, releaseType models.ReleaseType) *models.Release {
 	release := &models.Release{}
 	release.Name = strings.TrimSpace(name)
+	if len(release.Name) == 0 {
+		return nil
+	}
 
 	for _, n := range artistNames {
 		n = strings.TrimSpace(n)

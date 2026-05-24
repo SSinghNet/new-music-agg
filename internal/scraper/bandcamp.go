@@ -40,6 +40,9 @@ func normalizeTitle(s string) string {
 func makeBandcampRelease(name string, artistNames []string, publishDate string, link string, releaseType models.ReleaseType) *models.Release {
 	release := &models.Release{}
 	release.Name = strings.TrimSpace(name)
+	if release.Name == "" {
+		return nil
+	}
 
 	for _, n := range artistNames {
 		release.Artists = append(release.Artists, models.Artist{Name: strings.TrimSpace(n)})

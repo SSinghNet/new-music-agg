@@ -15,6 +15,9 @@ import (
 func makeNPRRelease(name string, artistNames []string, publishDate string, link string, releaseType models.ReleaseType) *models.Release {
 	release := &models.Release{}
 	release.Name = strings.TrimSpace(name)
+	if len(release.Name) == 0 {
+		return nil
+	}
     publishDate = strings.TrimSpace(publishDate)
 
 	for _, n := range artistNames {

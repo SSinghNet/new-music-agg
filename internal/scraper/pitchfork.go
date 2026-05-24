@@ -18,6 +18,9 @@ func makePitchforkRelease(name string, artistNames []string, publishDate string,
 	name = strings.ReplaceAll(name, "”", "")
 	name = strings.ReplaceAll(name, "’", "'")
 	release.Name = strings.TrimSpace(name)
+	if len(release.Name) == 0 {
+		return nil
+	}
 
 	for _, n := range artistNames {
 		n = strings.TrimSpace(n)
