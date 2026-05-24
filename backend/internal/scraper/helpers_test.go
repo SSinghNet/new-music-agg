@@ -3,7 +3,7 @@ package scraper
 import (
 	"testing"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 )
 
 func checkReleases(t *testing.T, releases []*models.Release) {

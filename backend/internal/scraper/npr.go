@@ -3,18 +3,21 @@ package scraper
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 
 	"github.com/gocolly/colly"
 )
 
+var trailingLabelRe = regexp.MustCompile(`,?\s*\([^)]+\)\s*$`)
+
 func makeNPRRelease(name string, artistNames []string, publishDate string, link string, releaseType models.ReleaseType) *models.Release {
 	release := &models.Release{}
-	release.Name = strings.TrimSpace(name)
+	release.Name = strings.TrimSpace(trailingLabelRe.ReplaceAllString(strings.TrimSpace(name), ""))
 	if len(release.Name) == 0 {
 		return nil
 	}

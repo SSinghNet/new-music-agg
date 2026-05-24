@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
-	"github.com/SSinghNet/new-music-agg/internal/store"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/store"
 )
 
 type ReleaseService interface {

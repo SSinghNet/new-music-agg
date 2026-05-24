@@ -31,7 +31,8 @@ const (
 
 type Artist struct {
 	gorm.Model
-	Name string `json:"name" gorm:"uniqueIndex;not null"`
+	Name     string    `json:"name" gorm:"uniqueIndex;not null"`
+	Releases []Release `json:"releases" gorm:"many2many:release_artists;"`
 }
 
 type Release struct {

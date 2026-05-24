@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 )
 
 // Run executes all scrapers concurrently across the given number of pages

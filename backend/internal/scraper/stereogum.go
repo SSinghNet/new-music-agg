@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 
 	"github.com/gocolly/colly"
 )
@@ -52,12 +52,12 @@ func scrapeStereogumCategory(baseURL string, labelPrefix string, releaseType mod
 
 	c.OnHTML(`[class*="PostCard_stackedWrapper"]`, func(e *colly.HTMLElement) {
 		link := "https://stereogum.com" + e.ChildAttr(`[class*="PostCard_titleLink"]`, "href")
-		name := e.ChildText(`[class*="PostCard_title"] em`)
+		name := e.ChildText(`h3[class*="PostCard_title"] em`)
 		if name == "" {
-			name = e.ChildText(`[class*="PostCard_title"] i`)
+			name = e.ChildText(`h3[class*="PostCard_title"] i`)
 		}
 
-		h3Text := e.ChildText(`[class*="PostCard_title"]`)
+		h3Text := e.ChildText(`h3[class*="PostCard_title"]`)
 		artist := strings.TrimSpace(strings.NewReplacer(
 			labelPrefix, "",
 			name, "",

@@ -8,14 +8,14 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 
 	"github.com/gocolly/colly"
 )
 
 // After normalization all quotes are straight " and all whitespace is ASCII space.
 var bandcampTitleRe = regexp.MustCompile(`^(.+?)\s*[,，]\s*"([^"]+)"`)
-var bandcampArtistSplitRe = regexp.MustCompile(`\s*(?:,|&|x)\s*`)
+var bandcampArtistSplitRe = regexp.MustCompile(`\s*(?:,|&|\band\b|x)\s*`)
 
 // normalizeTitle collapses Unicode whitespace variants to ASCII space and
 // maps curly/fancy quotes to straight double quotes so the regex stays simple.

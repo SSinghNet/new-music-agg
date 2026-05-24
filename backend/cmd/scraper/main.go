@@ -7,8 +7,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/SSinghNet/new-music-agg/internal/scraper"
-	"github.com/SSinghNet/new-music-agg/internal/store"
+	"github.com/SSinghNet/new-music-agg/backend/internal/scraper"
+	"github.com/SSinghNet/new-music-agg/backend/internal/store"
 
 	"github.com/joho/godotenv"
 )

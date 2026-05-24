@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/httputil"
-	"github.com/SSinghNet/new-music-agg/internal/models"
-	"github.com/SSinghNet/new-music-agg/internal/service"
-	"github.com/SSinghNet/new-music-agg/internal/store"
+	"github.com/SSinghNet/new-music-agg/backend/internal/httputil"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/service"
+	"github.com/SSinghNet/new-music-agg/backend/internal/store"
 
 	"github.com/go-chi/chi/v5"
 )

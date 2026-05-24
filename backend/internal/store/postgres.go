@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"strings"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -100,23 +101,25 @@ func (s *GORMStore) findOrCreateArtists(ctx context.Context, artists []models.Ar
 	}
 
 	names := make([]string, len(artists))
+	lowerNames := make([]string, len(artists))
 	for i, a := range artists {
 		names[i] = a.Name
+		lowerNames[i] = strings.ToLower(a.Name)
 	}
 
 	var existing []models.Artist
-	if err := s.db.WithContext(ctx).Where("name IN ?", names).Find(&existing).Error; err != nil {
+	if err := s.db.WithContext(ctx).Where("LOWER(name) IN ?", lowerNames).Find(&existing).Error; err != nil {
 		return nil, err
 	}
 
 	byName := make(map[string]models.Artist, len(existing))
 	for _, a := range existing {
-		byName[a.Name] = a
+		byName[strings.ToLower(a.Name)] = a
 	}
 
 	var toCreate []models.Artist
-	for _, name := range names {
-		if _, ok := byName[name]; !ok {
+	for i, name := range names {
+		if _, ok := byName[lowerNames[i]]; !ok {
 			toCreate = append(toCreate, models.Artist{Name: name})
 		}
 	}
@@ -124,7 +127,7 @@ func (s *GORMStore) findOrCreateArtists(ctx context.Context, artists []models.Ar
 	if len(toCreate) > 0 {
 		// ON CONFLICT DO NOTHING handles concurrent inserts of the same artist name.
 		if err := s.db.WithContext(ctx).
-			Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "name"}}, DoNothing: true}).
+			Clauses(clause.OnConflict{DoNothing: true}).
 			Create(&toCreate).Error; err != nil {
 			return nil, err
 		}
@@ -133,25 +136,25 @@ func (s *GORMStore) findOrCreateArtists(ctx context.Context, artists []models.Ar
 		var missing []string
 		for _, a := range toCreate {
 			if a.ID == 0 {
-				missing = append(missing, a.Name)
+				missing = append(missing, strings.ToLower(a.Name))
 			} else {
-				byName[a.Name] = a
+				byName[strings.ToLower(a.Name)] = a
 			}
 		}
 		if len(missing) > 0 {
 			var refetched []models.Artist
-			if err := s.db.WithContext(ctx).Where("name IN ?", missing).Find(&refetched).Error; err != nil {
+			if err := s.db.WithContext(ctx).Where("LOWER(name) IN ?", missing).Find(&refetched).Error; err != nil {
 				return nil, err
 			}
 			for _, a := range refetched {
-				byName[a.Name] = a
+				byName[strings.ToLower(a.Name)] = a
 			}
 		}
 	}
 
-	resolved := make([]models.Artist, 0, len(names))
-	for _, name := range names {
-		resolved = append(resolved, byName[name])
+	resolved := make([]models.Artist, 0, len(lowerNames))
+	for _, lower := range lowerNames {
+		resolved = append(resolved, byName[lower])
 	}
 	return resolved, nil
 }
@@ -198,7 +201,7 @@ func (s *GORMStore) List(ctx context.Context, p ListParams) ([]*models.Release, 
 	if p.Artist != nil {
 		q = q.Joins("JOIN release_artists ra ON ra.release_id = releases.id").
 			Joins("JOIN artists a ON a.id = ra.artist_id").
-			Where("a.name = ?", *p.Artist)
+			Where("LOWER(a.name) = LOWER(?)", *p.Artist)
 	}
 	if p.DateFrom != nil {
 		q = q.Where("releases.publish_date >= ?", *p.DateFrom)
@@ -236,4 +239,34 @@ func (s *GORMStore) GetByID(ctx context.Context, id uint) (*models.Release, erro
 		return nil, ErrNotFound
 	}
 	return &r, err
+}
+
+func (s *GORMStore) ListArtists(ctx context.Context, p ListArtistsParams) ([]*models.Artist, int, error) {
+	q := s.db.WithContext(ctx).Model(&models.Artist{})
+
+	var total int64
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	limit := p.Limit
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+
+	var artists []*models.Artist
+	err := q.Preload("Releases").
+		Order("artists.name ASC").
+		Limit(limit).Offset(p.Offset).
+		Find(&artists).Error
+	return artists, int(total), err
+}
+
+func (s *GORMStore) GetArtistByID(ctx context.Context, id uint) (*models.Artist, error) {
+	var a models.Artist
+	err := s.db.WithContext(ctx).Preload("Releases").First(&a, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, ErrArtistNotFound
+	}
+	return &a, err
 }

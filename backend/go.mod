@@ -1,4 +1,4 @@
-module github.com/SSinghNet/new-music-agg
+module github.com/SSinghNet/new-music-agg/backend
 
 go 1.25.0
 

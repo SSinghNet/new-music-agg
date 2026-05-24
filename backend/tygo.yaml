@@ -1,0 +1,8 @@
+packages:
+  - path: "github.com/SSinghNet/new-music-agg/backend/internal/models"
+    output_path: "../frontend/src/types/models.gen.ts"
+    type_mappings:
+      "gorm.DeletedAt": "string | null"
+      "time.Time": "string"
+  - path: "github.com/SSinghNet/new-music-agg/backend/internal/httputil"
+    output_path: "../frontend/src/types/httputil.gen.ts"

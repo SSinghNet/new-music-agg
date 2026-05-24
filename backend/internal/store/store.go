@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 )
 
 type ListParams struct {
@@ -20,12 +20,20 @@ type ListParams struct {
 	OrderDir    string // "desc" (default) | "asc"
 }
 
+type ListArtistsParams struct {
+	Limit  int
+	Offset int
+}
+
 type Store interface {
 	Upsert(ctx context.Context, r *models.Release) error
 	UpsertBatch(ctx context.Context, releases []*models.Release) error
 	List(ctx context.Context, p ListParams) ([]*models.Release, int, error)
 	GetByID(ctx context.Context, id uint) (*models.Release, error)
+	ListArtists(ctx context.Context, p ListArtistsParams) ([]*models.Artist, int, error)
+	GetArtistByID(ctx context.Context, id uint) (*models.Artist, error)
 	Close()
 }
 
 var ErrNotFound = errors.New("release not found")
+var ErrArtistNotFound = errors.New("artist not found")

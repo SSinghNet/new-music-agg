@@ -5,18 +5,16 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/SSinghNet/new-music-agg/internal/api"
-	"github.com/SSinghNet/new-music-agg/internal/api/handler"
-	"github.com/SSinghNet/new-music-agg/internal/service"
-	"github.com/SSinghNet/new-music-agg/internal/store"
+	"github.com/SSinghNet/new-music-agg/backend/internal/api"
+	"github.com/SSinghNet/new-music-agg/backend/internal/api/handler"
+	"github.com/SSinghNet/new-music-agg/backend/internal/service"
+	"github.com/SSinghNet/new-music-agg/backend/internal/store"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Load dotenv failed")
-	}
+	_ = godotenv.Load()
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
@@ -36,7 +34,10 @@ func main() {
 	releaseSvc := service.NewReleaseService(st)
 	releaseHandler := handler.NewReleaseHandler(releaseSvc)
 
-	r := api.NewRouter(releaseHandler)
+	artistSvc := service.NewArtistService(st)
+	artistHandler := handler.NewArtistHandler(artistSvc)
+
+	r := api.NewRouter(releaseHandler, artistHandler)
 
 	log.Printf("listening on :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SSinghNet/new-music-agg/internal/models"
+	"github.com/SSinghNet/new-music-agg/backend/internal/models"
 
 	"github.com/gocolly/colly"
 )
